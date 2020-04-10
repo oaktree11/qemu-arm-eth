@@ -1,0 +1,30 @@
+# create .o files from .bmp image files; to be included as RAW data sections
+arm-none-eabi-objcopy -I binary -O elf32-littlearm -B arm panda.bmp panda.o
+arm-none-eabi-objcopy -I binary -O elf32-littlearm -B arm porkcar.bmp porkcar.o
+
+# show exported symbols
+nm -S -t d panda.o
+nm -S -t d porkcar.o
+
+# compile-link
+arm-none-eabi-as -mcpu=arm926ej-s -g ts.s -o ts.o
+arm-none-eabi-gcc -c -mcpu=arm926ej-s -g t.c -o t.o
+arm-none-eabi-gcc -c -mcpu=arm926ej-s -g lan91c111.c -o lan91c111.o
+arm-none-eabi-gcc -c -mcpu=arm926ej-s -g tcpip.c -o tcpip.o
+arm-none-eabi-gcc -c -mcpu=arm926ej-s -g timer.c -o timer.o
+arm-none-eabi-gcc -c -mcpu=arm926ej-s -g interrupts.c -o interrupts.o
+arm-none-eabi-ld -T t.ld ts.o t.o lan91c111.o tcpip.o timer.o interrupts.o -o t.elf
+arm-none-eabi-objcopy -O binary t.elf t.bin
+
+rm *.o *.elf
+
+echo ready to go?
+read dummy
+
+
+ 
+# after version 2.11 qemu-system-arm
+qemu-system-arm -M versatilepb -m 128M -kernel t.bin -netdev user,id=net0,hostfwd=tcp::8081-:80 -object filter-dump,id=net0,netdev=net0,file=qemu.pcap -net nic,id=net0,netdev=net0,model=smc91c111 -serial mon:stdio
+
+
+
