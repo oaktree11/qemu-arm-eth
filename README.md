@@ -1,4 +1,5 @@
 # qemu-arm-eth
+Easyweb ported to the arm versatilepb board on qemu
 
 The EasyWeb application was originally written by Andreas Dannenberg
 of HTWK Leipzig, University of Applied Sciences, Germany, running on
